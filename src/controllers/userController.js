@@ -106,29 +106,30 @@ const createUser = async (req, res) => {
                     message:
                         "Password should consist a minimum of 8 characters and a maximum of 15 characters.",
                 });
-        const saltRounds = 10;
-        bcrypt.hash(password, saltRounds, function (err, hash) {
+        const salt = await bcrypt.genSalt(10);
+
+        bcrypt.hash(password, salt, async function (err, hash) {
             // Store hash in database here
             if (err) return res.status(500).send({ status: false, message: err.message })
-                req.password = hash
-            });
-            data.password = req.password
+            data.password = await bcrypt.hash(data.password, salt);
+        });
+        //  data.password = req.password
 
         //------------------------------
 
-        // if (!profileImage)
-        //     return res
-        //         .status(400)
-        //         .send({ status: false, message: "profile image is required." });
-
-        // if (!validators.isvalidImage(profileImage))
-        //     return res
-        //         .status(400)
-        //         .send({
-        //             status: false,
-        //             message:
-        //                 "Image should be in the format of jpg, png, jpeg",
-        //         });
+        if (!profileImage)
+            return res
+                .status(400)
+                .send({ status: false, message: "profile image is required." });
+        console.log(profileImage)
+        if (!validators.isvalidImage(profileImage))
+            return res
+                .status(400)
+                .send({
+                    status: false,
+                    message:
+                        "Image should be in the format of jpg, png, jpeg",
+                });
         //--------------------------------
         let uploadedImage = await aws.uploadFile(profileImage)
 
@@ -142,4 +143,53 @@ const createUser = async (req, res) => {
     }
 }
 
+
+const userLogin = async function (req, res) {
+    try {
+        if (Object.keys(req.body).length == 0) {
+            return res.status(400).send({ status: false, message: "please enter emailId and password" })
+        }
+        let userName = req.body.email;
+        if (!userName)
+            return res.status(400).send({ status: false, message: 'please enter emailId' });
+
+        let password = req.body.password;
+        if (!password)
+            return res.status(400).send({ status: false, message: 'please enter password' });
+
+        let user = await userModel.findOne({
+            email: userName
+        });
+        if(!user){
+            return res.status(401).send({
+                status : false,
+                message : "Email Id not correct"
+            })
+        }
+        if (user) {
+            // check user password with hashed password stored in the database
+            const validPassword = await bcrypt.compare(password, user.password);
+            if (!validPassword) {
+                return res.status(401).send({ status :false, message: "Invalid Password" });
+            }
+        }
+
+        let token = jwt.sign(
+            {
+                userId: user._id.toString(),
+            },
+            "projectGroup06",
+            { expiresIn: '60m' }
+        );
+        res.setHeader('x-api-key', token);  
+        return res.status(200).send({
+            status : true,
+            userId: user._id,
+            token : token
+        })
+    } catch (err) {
+        return res.status(500).send({ status: false, message: err.message });
+    }
+};
 module.exports.createUser = createUser
+module.exports.userLogin = userLogin

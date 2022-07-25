@@ -59,7 +59,8 @@ const isValidPassword = function (password) {
 // ================ Image Validation ===========================================================================================//
 
 const isvalidImage = (profileImage) =>{
-    return  /^(.*?)\.(jpg|jpeg|png|JPG|JPEG|PNG)$/.test(profileImage)
+    return  /^(.*?)\.(jpg|jpeg|png|JPG|JPEG|PNG)$/.test(profileImage.originalname)
+  
 }
 
 
