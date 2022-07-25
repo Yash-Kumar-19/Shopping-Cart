@@ -58,10 +58,27 @@ const isValidPassword = function (password) {
 
 // ================ Image Validation ===========================================================================================//
 
-const isvalidImage = (profileImage) =>{
-    return  /^(.*?)\.(jpg|jpeg|png|JPG|JPEG|PNG)$/.test(profileImage.originalname)
-  
+const isvalidImage = function (profileImage) {
+  return  /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i.test(profileImage.originalname)
 }
+
+// ================ Address Validation ===========================================================================================//
+
+const isValidAddress = function (address){
+  if (typeof address !== 'object' || Array.isArray(address) || Object.keys(address).length == 0) {
+    return false  
+  }else{
+    return true
+  }
+}
+
+const isvalidPin = function (pincode){
+  return /^[1-9]{1}[0-9]{2}\s{0,1}[0-9]{3}$/.test(pincode)
+}
+const isvalidCity = function (city){
+  return /^[a-zA-z',.\s-]{1,25}$/.test(city)
+}
+
 
 
 
@@ -75,5 +92,8 @@ module.exports = {
   isValidURL,
   isValidObjectId,
   isValidPassword,
-  isvalidImage
+  isvalidImage,
+  isValidAddress,
+  isvalidPin,
+  isvalidCity
 };
