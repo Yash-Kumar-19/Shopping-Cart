@@ -64,13 +64,13 @@ const isvalidImage = function (profileImage) {
 
 // ================ Address Validation ===========================================================================================//
 
-const isValidAddress = function (address){
-  if (typeof address !== 'object' || Array.isArray(address) || Object.keys(address).length == 0) {
-    return false  
-  }else{
-    return true
-  }
-}
+// const isValidAddress = function (address){
+//   if (typeof address !== 'object' || Array.isArray(address) || Object.keys(address).length == 0) {
+//     return false  
+//   }else{
+//     return true
+//   }
+// }
 
 const isvalidPin = function (pincode){
   return /^[1-9]{1}[0-9]{2}\s{0,1}[0-9]{3}$/.test(pincode)
@@ -93,7 +93,6 @@ module.exports = {
   isValidObjectId,
   isValidPassword,
   isvalidImage,
-  isValidAddress,
   isvalidPin,
   isvalidCity
 };
