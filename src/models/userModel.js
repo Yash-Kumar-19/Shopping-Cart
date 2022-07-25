@@ -7,18 +7,18 @@ const userSchema = new mongoose.Schema({
     profileImage: { type: String, required: true }, 
     phone: { type: String, required: true, trim: true, unique: true },
     password: { type: String, required: true }, 
-    // address: {
-    //     shipping: {
-    //         street: { type: String, required: true, trim: true },
-    //         city: { type: String, required: true, trim: true },
-    //         pincode: { type: Number, required: true, trim: true }
-    //     },
-    //     billing: {
-    //         street: { type: String, required: true, trim: true },
-    //         city: { type: String, required: true, trim: true },
-    //         pincode: { type: Number, required: true, trim: true }
-    //     }
-    // }
+    address: {
+        shipping: {
+            street: { type: String, required: true, trim: true },
+            city: { type: String, required: true, trim: true },
+            pincode: { type: Number, required: true, trim: true }
+        },
+        billing: {
+            street: { type: String, required: true, trim: true },
+            city: { type: String, required: true, trim: true },
+            pincode: { type: Number, required: true, trim: true }
+        }
+    }
 }, { timestamps: true })
 
 module.exports = mongoose.model('User', userSchema)

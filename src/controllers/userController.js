@@ -21,6 +21,7 @@ const createUser = async (req, res) => {
 
         let { fname, lname, email, password, phone, address } = data
 
+        console.log(profileImage)
         //------validations-----------
 
         if (!validators.isValidField(fname))
@@ -108,34 +109,118 @@ const createUser = async (req, res) => {
                 });
         const saltRounds = 10;
         bcrypt.hash(password, saltRounds, function (err, hash) {
-            // Store hash in database here
             if (err) return res.status(500).send({ status: false, message: err.message })
-                req.password = hash
-            });
-            data.password = req.password
+            data.password = hash
+        });
 
-        //------------------------------
+        //-----------Image-------------------
 
-        // if (!profileImage)
-        //     return res
-        //         .status(400)
-        //         .send({ status: false, message: "profile image is required." });
+        if (!profileImage)
+            return res
+                .status(400)
+                .send({ status: false, message: "profile image is required." });
 
-        // if (!validators.isvalidImage(profileImage))
-        //     return res
-        //         .status(400)
-        //         .send({
-        //             status: false,
-        //             message:
-        //                 "Image should be in the format of jpg, png, jpeg",
-        //         });
-        //--------------------------------
+        if (!validators.isvalidImage(profileImage))
+            return res
+                .status(400)
+                .send({
+                    status: false,
+                    message:
+                        "Image should be in the format of jpg, png, jpeg",
+                });
         let uploadedImage = await aws.uploadFile(profileImage)
 
         data.profileImage = uploadedImage
 
+        //---(Address)
+
+        console.log(address);
+        if (!validators.isValidAddress(address)) {
+            return res.status(400).send({ status: false, message: 'Shipping  & Billing address is required.' })
+        }
+        let { shipping, billing } = address
+        //Shipping Address
+        if (!validators.isValidAddress(shipping)) {
+            return res.status(400).send({ status: false, message: 'Shipping address is required.' })
+        }
+
+        if ('shipping' in address) {
+            let { street, city, pincode } = shipping
+
+            if (!validators.isValidField(street))
+                return res
+                    .status(400)
+                    .send({ status: false, message: "Shipping Street is required." });
+
+
+            if (!validators.isValidField(city))
+                return res
+                    .status(400)
+                    .send({ status: false, message: "Shipping City is required." });
+
+            if (!validators.isvalidCity()) {
+                return res
+                    .status(400)
+                    .send({ status: false, message: "City name is not valid." });
+            }
+
+            if (!validators.isValidField(pincode))
+                return res
+                    .status(400)
+                    .send({ status: false, message: "Shipping Pincode required." });
+            pincode= pincode.toString()
+            if (!validators.isvalidPin(pincode)) {
+                return res
+                    .status(400)
+                    .send({ status: false, message: "Pincode is not valid." });
+            }
+
+
+        }
+
+
+        //Billing Address
+        if (!validators.isValidAddress(billing)) {
+            return res.status(400).send({ status: false, message: 'Billing address is required.' })
+        }
+
+        if ('billing' in address) {
+            let { street, city, pincode } = billing
+
+            if (!validators.isValidField(street))
+                return res
+                    .status(400)
+                    .send({ status: false, message: "Billing Street is required." });
+
+
+            if (!validators.isValidField(city))
+                return res
+                    .status(400)
+                    .send({ status: false, message: "Billing City is required." });
+
+            if (!validators.isvalidCity()) {
+                return res
+                    .status(400)
+                    .send({ status: false, message: "City name is not valid." });
+            }
+
+            if (!validators.isValidField(pincode))
+                return res
+                    .status(400)
+                    .send({ status: false, message: "Billing Pincode required." });
+            pincode = pincode.toString();
+            if (!validators.isvalidPin(pincode)) {
+                return res
+                    .status(400)
+                    .send({ status: false, message: "Pincode is not valid." });
+            }
+        }
+
+
+        //--------------------------------
+
         let create = await userModel.create(data)
-        res.send(create)
+        res.status(201).send({ status: true, data: create })
 
     } catch (err) {
         return res.status(500).send({ status: false, message: err.message })
