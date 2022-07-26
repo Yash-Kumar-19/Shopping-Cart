@@ -2,10 +2,7 @@ const userModel = require('../models/userModel')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const validators = require('../validator/validtor')
-const { response } = require('express')
 const aws = require('../aws/awsS3')
-
-
 
 const createUser = async (req, res) => {
     try {
@@ -107,6 +104,7 @@ const createUser = async (req, res) => {
                     message:
                         "Password should consist a minimum of 8 characters and a maximum of 15 characters.",
                 });
+
         const saltRounds = 10;
         bcrypt.hash(password, saltRounds, function (err, hash) {
             if (err) return res.status(500).send({ status: false, message: err.message })
@@ -168,13 +166,11 @@ const createUser = async (req, res) => {
                     .status(400)
                     .send({ status: false, message: "Shipping Pincode required." });
             pincode = pincode.toString()
+          
             if (!validators.isvalidPin(pincode)) {
                 return res
                     .status(400)
-                    .send({ status: false, message: "Pincode is not valid." });
-            }
-
-
+                    .send({ status: false, message: "Pincode is not valid." })}
         }
 
 
@@ -219,13 +215,12 @@ const createUser = async (req, res) => {
         //--------------------------------
 
         let create = await userModel.create(data)
-        res.status(201).send({ status: true, data: create })
+      return  res.status(201).send({ status: true, data: create })
 
     } catch (err) {
         return res.status(500).send({ status: false, message: err.message })
     }
 }
-
 
 const userLogin = async function (req, res) {
     try {
@@ -274,5 +269,18 @@ const userLogin = async function (req, res) {
         return res.status(500).send({ status: false, message: err.message });
     }
 };
+ const getUserProfile = async (req,res)=>{
+
+    let userId = req.params.userId;
+
+    if(!validators.isValidObjectId(userId)) return res.status(400).send({status: false, message:"Invalid UserId"})
+   
+    let userProfile = await userModel.findById(userId)
+    
+    if(!userProfile) return res.status(404).send({status: false, message: "User Profile not exits"})
+    return res.status(200).send({status: true, data: userProfile});
+ }
+
 module.exports.createUser = createUser
 module.exports.userLogin = userLogin
+module.exports.getUserProfile = getUserProfile
