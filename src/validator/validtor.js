@@ -59,7 +59,7 @@ const isValidPassword = function (password) {
 // ================ Image Validation ===========================================================================================//
 
 const isvalidImage = function (profileImage) {
-  return  /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i.test(profileImage.originalname)
+  return  /\.(jpe?g|tiff?|png|webp|bmp)$/i.test(profileImage.originalname)
 }
 
 // ================ Address Validation ===========================================================================================//
