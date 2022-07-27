@@ -398,12 +398,12 @@ const updateUser = async (req, res) => {
       if (!validators.isValidField(data.email))
         return res
           .status(400)
-          .send({ status: false, message: "email Name is required." });
+          .send({ status: false, message: "email is required." });
 
       if (!validators.isValidEmail(data.email)) {
         return res.status(400).send({
           status: false,
-          message: "email is not a valid email",
+          message: "email is not a valid",
         });
       }
       let emailAlreadyExists = await userModel.findOne({ email: data.email });
@@ -473,6 +473,7 @@ const updateUser = async (req, res) => {
 
       updateObject.profileImage = uploadedImage;
     }
+    
 
     //----------(Address)
     if (data.address) {
@@ -481,7 +482,7 @@ const updateUser = async (req, res) => {
       let { shipping, billing } = address;
 
       console.log(address.shipping.street);
-
+      //Shipping
       if (address.shipping) {
         let { street, city, pincode } = shipping;
         if (street) {
@@ -499,6 +500,7 @@ const updateUser = async (req, res) => {
           updateObject.address.shipping.pincode = pincode;
         }
       }
+      //Billing
       if ("billing" in address) {
         let { street, city, pincode } = billing;
         if (street) {
@@ -542,3 +544,35 @@ module.exports.createUser = createUser;
 module.exports.userLogin = userLogin;
 module.exports.getUser = getUser;
 module.exports.updateUser = updateUser;
+
+
+
+
+  let getBook = async (req, res) => {
+    try {
+        let filterProduct = req.query
+
+        //---------[Validation]
+
+        if (filterProduct.productId) {
+            if (!mongoose.Types.ObjectId.isValid(filterProduct.productId)) return res.status(400).send({ status: false, message: 'Invalid productId Format' })
+        }
+
+
+        //---------[Find product]
+
+        let data = await productModel.find({ $and: [filterProduct, { isDeleted: false }] })
+
+        if (Object.keys(data).length == 0) return res.status(404).send({ status: false, message: 'Book not found' })
+
+        //---------[Response Send]
+
+        res.status(200).send({ status: true, message: 'Book list', data: data })
+    }
+    catch (err) {
+        return res.status(500).send({ status: false, message: err.message })
+    }
+}
+
+  module.exports.getProductById = getProductById;
+  module.exports.deleteProduct = deleteProduct;
