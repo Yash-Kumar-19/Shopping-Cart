@@ -1,7 +1,7 @@
 const productModel = require("../models/productModel")
 const validators = require("../validator/validtor");
 const aws = require("../aws/awsS3");
-const { isValidObjectId } = require("mongoose");
+
 
 const createProduct = async (req, res) => {
     try {
@@ -180,12 +180,11 @@ let deleteProduct = async (req, res) => {
 };
 
 
-//==========================================[ GET FILTERD PRODUCT ]=================================================>
+//======================================[ GET FILTERD PRODUCT ]========================================>
 
 let getProduct = async (req, res) => {
     try {
         let filterProduct = req.query
-        console.log(filterProduct);
         let newObject = {}
         if ('name' in filterProduct) {
             newObject.title = filterProduct.name
@@ -207,7 +206,6 @@ let getProduct = async (req, res) => {
             let temp = filterProduct.size.split(',').map(String)
             newObject.availableSizes = {$in: temp}
         }
-        console.log(newObject);
 
         //---------[Find product]
 
@@ -217,7 +215,7 @@ let getProduct = async (req, res) => {
 
         //---------[Response Send]
 
-        res.status(200).send({ status: true, message: 'Book list', data: data })
+        res.status(200).send({ status: true, message: 'Product list', data: data })
     }
     catch (err) {
         return res.status(500).send({ status: false, message: err.message })
