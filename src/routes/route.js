@@ -37,6 +37,9 @@ router.get("/products/:productId", productController.getProductById);
 //              <----[Delete Product]------>
 router.delete("/products/:productId", productController.deleteProduct)
 
+//              <----[Update Product]------>
+router.put("/products/:productId", productController.updateProducts)
+
 
 
 //===================( Export )========================>
