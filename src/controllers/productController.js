@@ -108,7 +108,7 @@ const createProduct = async (req, res) => {
         if (!productImage)
             return res
                 .status(400)
-                .send({ status: false, message: "profile image is required." });
+                .send({ status: false, message: "product image is required." });
 
         if (!validators.isvalidImage(productImage))
             return res.status(400).send({
@@ -212,23 +212,25 @@ let getProduct = async (req, res) => {
         }
         if ('size' in filterProduct) {
             let temp;
-            if (typeof availableSizes == "object") temp = availableSizes;
+            if (typeof size == "object") temp = filterProduct.size;
             else temp = filterProduct.size.split(',').map(x => x.trim())
             newObject.availableSizes = { $in: temp }
         }
-        let sortPrice = 1 
-        if('priceSort' in filterProduct) {
-            if(filterProduct.priceSort == '-1'){
+        let sortPrice = 1
+        if ('priceSort' in filterProduct) {
+            if(filterProduct.priceSort != 1 && filterProduct.priceSort != -1) {
+                return res.status(400).send({status: false, message: 'Price sort can only be 1 or -1'})
+            }
+            if (filterProduct.priceSort == '-1') {
                 sortPrice = -1
             }
         }
         console.log(sortPrice);
-        //---------[Find product] //
-
+        //---------[Find product] 
         let data = await productModel.find({ $and: [newObject, { isDeleted: false }] }).sort({ price: sortPrice })
-
         if (data.length == 0) return res.status(404).send({ status: false, message: 'Product not found' });
 
+        //-------[title]
         if ('name' in filterProduct) {
             let newData = []
             for (let i of data) {
@@ -245,9 +247,7 @@ let getProduct = async (req, res) => {
                 })
         }
 
-
         //---------[Response Send]
-
         res.status(200).send({ status: true, message: 'Product list', data: data })
     }
     catch (err) {
@@ -264,32 +264,32 @@ let updateProducts = async function (req, res) {
 
         //-------[Validations]
         if (!validators.isValidObjectId(productId)) return res.status(400).send({ status: false, message: 'Invalid productId Format' })
-
-        //---------[Check product is Present in Db or not]
-        
-        let checkProduct = await productModel.findOne({ _id: productId, isDeleted: false });
-        if (!checkProduct) return res.status(404).send({ status: false, message: "Product Not Found" });
-        
-        //-------[]
+        //-------[valid body]
         if (!validators.isValidRequestBody(body))
             return res.status(400).send({
                 status: false,
                 message:
                     "Invalid request parameter. Please provide user details in request body.",
             });
+        
+        //---------[Check product is Present in Db or not]
+        let checkProduct = await productModel.findOne({ _id: productId, isDeleted: false });
+        if (!checkProduct) return res.status(404).send({ status: false, message: "Product Not Found" });
 
+        //-------[Destructure]
         let { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments } = body
 
+        //-------[title]
         if ('title' in body) {
             if (!validators.isValidField(title))
                 return res
-                .status(400)
+                    .status(400)
                     .send({ status: false, message: "title is required." });
             let alreadyTitle = await productModel.findOne({ title })
             if (alreadyTitle) return res.status(400).send({ status: false, message: `Title Already used is ${title}` })
             checkProduct.title = title
         }
-
+        //-------[discription]
         if ('description' in body) {
             if (!validators.isValidField(description))
                 return res
@@ -297,6 +297,7 @@ let updateProducts = async function (req, res) {
                     .send({ status: false, message: "description is required." });
             checkProduct.description = description
         }
+        //-------[price]
         if ('price' in body) {
             if (!validators.isValidField(price))
                 return res
@@ -311,6 +312,7 @@ let updateProducts = async function (req, res) {
             }
             checkProduct.price = price
         }
+        //-------[Currency]
         if ('currencyId' in body) {
             if (currencyId != 'INR') {
                 return res.status(400).send({
@@ -325,20 +327,22 @@ let updateProducts = async function (req, res) {
                 message: "currencyFormat is already ₹ cannot be changed.",
             });
         }
-        console.log(isFreeShipping != 'true' && isFreeShipping != 'false');
+        //-------[Free Shipping]
         if ('isFreeShipping' in body) {
-            if(isFreeShipping != 'true' && isFreeShipping != 'false'){
-            return res.status(400).send({ status: false, message: 'isFreeShipping is false or true'})
-           }
+            if (isFreeShipping != 'true' && isFreeShipping != 'false') {
+                return res.status(400).send({ status: false, message: 'isFreeShipping is false or true' })
+            }
             checkProduct.isFreeShipping = isFreeShipping
         }
+        //-------[style]
         if ('style' in body) {
             if (!validators.isValidField(style))
-            return res
-            .status(400)
-            .send({ status: false, message: "style can not be empty." });
+                return res
+                    .status(400)
+                    .send({ status: false, message: "style can not be empty." });
             checkProduct.style = style
         }
+        //-------[installments]
         if ('installments' in body) {
             if (!installments.match(/^[0-9.]+$/)) {
                 return res.status(400).send({
@@ -348,9 +352,10 @@ let updateProducts = async function (req, res) {
             }
             checkProduct.installments = installments;
         }
+        //-------[productImage]
         if (productImage) {
             if (!validators.isvalidImage(productImage))
-            return res.status(400).send({
+                return res.status(400).send({
                     status: false,
                     message: "Image should be in the format of jpg, png, jpeg",
                 });
@@ -358,6 +363,7 @@ let updateProducts = async function (req, res) {
 
             checkProduct.productImage = uploadedImage;
         }
+        //-------[Available sizes]
         if ('availableSizes' in body) {
             if (!validators.isValidField(availableSizes))
                 return res.status(400).send({ status: false, message: "availableSizes is required." });
@@ -366,7 +372,7 @@ let updateProducts = async function (req, res) {
                 let temp = availableSizes;
 
                 if (typeof availableSizes == "object") availableSizes = temp;
-                else availableSizes = temp.split(",").map(String);
+                else availableSizes = temp.split(",").map(x => x.trim());
             }
 
             for (let i of availableSizes) {
@@ -380,13 +386,13 @@ let updateProducts = async function (req, res) {
                 }
                 checkProduct.availableSizes.push(i)
             }
-            checkProduct.availableSizes = [ ...new Set (checkProduct.availableSizes) ]
+            checkProduct.availableSizes = [...new Set(checkProduct.availableSizes)]
         }
+        //-------[save]
         await checkProduct.save()
 
-        return res.status(200).send({ status: true, message:'Update product details is successful', data: checkProduct})
-
-
+        //-------[response]
+        return res.status(200).send({ status: true, message: 'Update product details is successful', data: checkProduct })
 
     } catch (err) {
         return res.status(500).send({ status: false, message: err.message })
