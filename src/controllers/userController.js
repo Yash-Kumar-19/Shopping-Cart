@@ -216,10 +216,10 @@ const createUser = async (req, res) => {
     //<--------(response)---------->
 
     let create = await userModel.create(data);
-    res.status(201).send({ status: true, data: create });
+    res.status(201).send({ status: true, message: 'Success' ,data: create });
 
   } catch (err) {
-    return res.status(500).send({ status: false, message: err.stack });
+    return res.status(500).send({ status: false, message: err.message });
   }
 };
 
@@ -273,7 +273,7 @@ const userLogin = async function (req, res) {
     res.setHeader("x-api-key", token);
     return res.status(200).send({
       status: true,
-      message: "User Login Successfull",
+      message: "Success",
       data:
       {userId: user._id,
       token: token,}
@@ -311,7 +311,7 @@ const getUser = async (req, res) => {
     }
     return res.status(200).send({
       status: true,
-      message: "User Profile Details",
+      message: "Success",
       data: findUser,
     });
   } catch (err) {
@@ -514,9 +514,9 @@ const updateUser = async (req, res) => {
     await findUser.save()
 
     //---------(Send Response)
-    return res.status(200).send({ status: true, message: "User Profile updated successfully", data: findUser });
+    return res.status(200).send({ status: true, message: "Success", data: findUser });
   } catch (err) {
-    return res.status(500).send({ status: false, message: err.stack });
+    return res.status(500).send({ status: false, message: err.message });
   }
 };
 

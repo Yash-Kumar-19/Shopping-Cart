@@ -4,6 +4,7 @@ const router = express.Router();
 const userController = require('../controllers/userController')
 const productController = require("../controllers/productController")
 const cartController = require("../controllers/cartController")
+const orderController = require("../controllers/orderController")
 const auth = require('../middleware/auth')
 
 
@@ -20,12 +21,15 @@ router.get("/products/:productId", productController.getProductById);
 router.delete("/products/:productId", productController.deleteProduct)
 router.put("/products/:productId", productController.updateProducts)
 
-//===================( Product Apis )========================>
+//===================( Cart Apis )========================>
 router.post("/users/:userId/cart",auth.authentication, cartController.createCart )
 router.put("/users/:userId/cart",auth.authentication, cartController.updateCart )
 router.get("/users/:userId/cart",auth.authentication, cartController.getCart )
 router.delete("/users/:userId/cart",auth.authentication, cartController.deleteCart )
 
+//===================( Order Apis )========================>
+router.post("/users/:userId/orders",auth.authentication, orderController.createOrder )
+router.put("/users/:userId/orders",auth.authentication, orderController.updateOrder )
  
 
 //===================( Export )========================>

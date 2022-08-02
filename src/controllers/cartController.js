@@ -76,7 +76,7 @@ let createCart = async function (req, res) {
             newCart.totalPrice = findproduct.price
             newCart.totalItems = 1
             let create = await cartModel.create(newCart)
-            return res.status(201).send({ status: true, data: create })
+            return res.status(201).send({ status: true, message: 'Success', data: create })
 
         } else {    //if cart is present
             let itemsPresent = findUserId.items
@@ -97,8 +97,9 @@ let createCart = async function (req, res) {
 
             await findUserId.save() //save document
 
-            return res.status(200).send({
+            return res.status(201).send({
                 status: true,                   //send response
+                message: 'Success',
                 data: findUserId
             })
         }
@@ -133,7 +134,7 @@ let updateCart = async function (req, res) {
         if (!validators.isValidObjectId(productId)) {
             return res.status(400).send({
                 status: false,
-                message: "Not a valid userId",
+                message: "Not a valid productId",
             });
         }
         let findproduct = await productModel.findOne({ _id: productId, isDeletd: false });
@@ -222,6 +223,7 @@ let updateCart = async function (req, res) {
 
         return res.status(200).send({
             status: true,
+            message: 'Success',
             data: findCart                  //<------[final response]------>
         })
 
@@ -327,10 +329,7 @@ let deleteCart = async (req, res) => {
         await findCart.save() //save doc
 
         // ===[ Response ]===
-        return res.status(200).send({
-            status: true,
-            data: findCart
-        })
+        return res.status(204).send({})
         
         
     } catch (err) {

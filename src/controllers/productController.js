@@ -149,7 +149,7 @@ let getProductById = async (req, res) => {
 
         //---------[Send Response]
 
-        res.status(200).send({ status: true, message: 'Success!', data: checkProduct })
+        res.status(200).send({ status: true, message: 'Success', data: checkProduct })
     }
     catch (err) {
         return res.status(500).send({ status: false, message: err.message })
@@ -248,7 +248,7 @@ let getProduct = async (req, res) => {
         }
 
         //---------[Response Send]
-        res.status(200).send({ status: true, message: 'Product list', data: data })
+        res.status(200).send({ status: true, message: 'Success', data: data })
     }
     catch (err) {
         return res.status(500).send({ status: false, message: err.message })
