@@ -113,7 +113,6 @@ let createCart = async function (req, res) {
 
 let updateCart = async function (req, res) {
     try {
-
         let userId = req.params.userId;
         let { productId, cartId, removeProduct } = req.body
 
@@ -156,7 +155,7 @@ let updateCart = async function (req, res) {
                 message: "Not a valid cartId",
             });
         }
-        let findCart = await cartModel.findOne({ _id: cartId });
+        let findCart = await cartModel.findOne({ _id: cartId , userId: userId });
         if (!findCart) {
             return res.status(404).send({
                 status: false,
@@ -273,6 +272,7 @@ let getCart = async (req, res) => {
         // ===[ Response ]===
         return res.status(200).send({
             status: true,
+            message: "Success",
             data: findCart
         })
 

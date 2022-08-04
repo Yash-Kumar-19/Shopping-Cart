@@ -130,9 +130,11 @@ const createUser = async (req, res) => {
     //<--------------(Address)--------------->
     if (address) {
       if (address) {
-        const passAddress = JSON.parse(data.address);
-        address = passAddress;
-        data.address = address;
+        try {
+          const passAddress = JSON.parse(data.address);
+          address = passAddress;
+          data.address = address;
+        } catch (e) { res.status(400).send({ status: false, message: "Address is invalid." }) }
       }
       let { shipping, billing } = address;
 
@@ -216,7 +218,7 @@ const createUser = async (req, res) => {
     //<--------(response)---------->
 
     let create = await userModel.create(data);
-    res.status(201).send({ status: true, message: 'Success' ,data: create });
+    res.status(201).send({ status: true, message: 'Success', data: create });
 
   } catch (err) {
     return res.status(500).send({ status: false, message: err.message });
@@ -275,8 +277,10 @@ const userLogin = async function (req, res) {
       status: true,
       message: "Success",
       data:
-      {userId: user._id,
-      token: token,}
+      {
+        userId: user._id,
+        token: token,
+      }
     });
   } catch (err) {
     return res.status(500).send({ status: false, message: err.message });
@@ -469,8 +473,11 @@ const updateUser = async (req, res) => {
 
     //----------(Address)
     if (data.address) {
-      const passAddress = JSON.parse(data.address);
-      address = passAddress;
+      try {
+        const passAddress = JSON.parse(data.address);
+        address = passAddress;
+      } catch (e) { res.status(400).send({ status: false, message: 'Address format is invalid.' }) }
+
       let { shipping, billing } = address;
 
       //Shipping

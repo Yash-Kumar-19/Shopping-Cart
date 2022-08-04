@@ -4,9 +4,8 @@ const router = express.Router();
 const userController = require('../controllers/userController')
 const productController = require("../controllers/productController")
 const cartController = require("../controllers/cartController")
-const orderController = require("../controllers/orderController")
+const orderController = require("../controllers/orderController") 
 const auth = require('../middleware/auth')
-
 
 //===================( User Apis )========================>
 router.post("/register", userController.createUser)
