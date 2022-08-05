@@ -10,7 +10,7 @@ const createUser = async (req, res) => {
   try {
     let data = req.body;
     let profileImage = req.files[0];
-    console.log(data);
+
 
     if (!validators.isValidRequestBody(req.body))
       return res.status(400).send({

@@ -46,7 +46,7 @@ let createOrder = async (req, res) => {
                 message: "Not a valid cartId",
             });
         }
-        let findCart = await cartModel.findOne({ _id: cartId, userId: userId }).select({ _id: 1, __v: 0, updatedAt: 0, createdAt: 0 });
+        let findCart = await cartModel.findOne({ _id: cartId, userId: userId }).select({ __v: 0, updatedAt: 0, createdAt: 0 });
         if (!findCart) {
             return res.status(404).send({
                 status: false,
@@ -68,17 +68,29 @@ let createOrder = async (req, res) => {
         for (let item of items) {
             totalQuantity += item.quantity
         }
-        if (cancellable != true && cancellable != false) {
-            return res.status(400).send({ status: false, message: 'cancellable can only be true or false' })
+        cancellable = true
+        if ('cancellable' in req.body) {
+            if (cancellable !== true && cancellable !== false) {
+                return res.status(400).send({ status: false, message: 'cancellable can only be true or false' })
+            } else {
+                cancellable = req.body.cancellable
+            }
         }
-
-        let order = { ...findCart.toObject(), totalQuantity, cancellable }
+        //-----[ Create response ]
+        let order = {
+            items: findCart.items,
+            userId: userId,
+            totalPrice: findCart.totalPrice,
+            totalItems: findCart.totalItems,
+            totalQuantity,
+            cancellable
+        }
         let create = await orderModel.create(order)
 
+        //------[ Cart Empty ]
         findCart.items.splice(0, findCart.items.length)
         findCart.totalPrice = 0
         findCart.totalItems = 0
-
         await findCart.save()
 
         //------[send response]-----
@@ -126,14 +138,14 @@ let updateOrder = async function (req, res) {
                 message: "User not found",
             });
         }
-           //------[Authorization]
-           let userAccessing = req.validToken.userId;
-           if (userId != userAccessing) {
-               return res.status(403).send({
-                   status: false,
-                   message: "User not authorised",
-               });
-           }
+        //------[Authorization]
+        let userAccessing = req.validToken.userId;
+        if (userId != userAccessing) {
+            return res.status(403).send({
+                status: false,
+                message: "User not authorised",
+            });
+        }
 
         //------[OrderId]
         if (!validators.isValidField(orderId))
@@ -155,7 +167,7 @@ let updateOrder = async function (req, res) {
             });
         }
 
-     
+
         if (findOrder.status !== 'pending') {
             return res.status(400).send({
                 status: false, message: `Order is already ${findOrder.status}`
