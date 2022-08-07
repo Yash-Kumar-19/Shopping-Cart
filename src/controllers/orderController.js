@@ -64,6 +64,9 @@ let createOrder = async (req, res) => {
         }
         //------[create]-----
         let items = findCart.items
+        if(items.length ==0){
+            return res.status(404).send({status: false, message: "No items found in cart"})
+        }
         let totalQuantity = 0
         for (let item of items) {
             totalQuantity += item.quantity
@@ -101,7 +104,7 @@ let createOrder = async (req, res) => {
         })
 
     } catch (err) {
-        return res.status(500).send({ status: false, message: err.stack })
+        return res.status(500).send({ status: false, message: err.message }); 
     }
 
 }

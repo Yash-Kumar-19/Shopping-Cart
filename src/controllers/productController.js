@@ -4,7 +4,7 @@ const validators = require("../validator/validtor");
 const aws = require("../aws/awsS3");
 
 
-//==========================================[ CREATE PRODUCT ]=================================================>
+//==========================================[ CREATE PRODUCT ]=========================================>
 const createProduct = async (req, res) => {
     try {
         let data = req.body;
@@ -212,7 +212,7 @@ let getProduct = async (req, res) => {
         }
         if ('size' in filterProduct) {
             let temp;
-            if (typeof size == "object") temp = filterProduct.size;
+            if (typeof filterProduct.size == "object") temp = filterProduct.size;
             else temp = filterProduct.size.split(',').map(x => x.trim())
             newObject.availableSizes = { $in: temp }
         }
@@ -248,7 +248,7 @@ let getProduct = async (req, res) => {
         }
 
         //---------[Response Send]
-        res.status(200).send({ status: true, message: 'Success', data: data })
+        res.status(200).send({ status: true, message: 'Success'})
     }
     catch (err) {
         return res.status(500).send({ status: false, message: err.message })
@@ -398,7 +398,6 @@ let updateProducts = async function (req, res) {
         return res.status(500).send({ status: false, message: err.message })
     }
 }
-
 
 
 //======================================[ Exports ]========================================>

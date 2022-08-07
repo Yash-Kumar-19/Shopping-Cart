@@ -262,7 +262,11 @@ let getCart = async (req, res) => {
             });
         }
         // ===[ find cart with userid ]===
-        let findCart = await cartModel.findOne({ userId: userId });
+        let findCart = await cartModel.findOne({ userId: userId }).populate({
+            path: 'items.productId',
+            select:
+              'title price productImage style availableSizes isDeleted',
+          });
         if (!findCart) {
             return res.status(404).send({
                 status: false,

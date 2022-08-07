@@ -4,13 +4,12 @@ const jwt = require("jsonwebtoken");
 const validators = require("../validator/validtor");
 const aws = require("../aws/awsS3");
 
-//==========================================[ CREATE ]=================================================>
+//==========================================[ CREATE ]========================================>
 
 const createUser = async (req, res) => {
   try {
     let data = req.body;
     let profileImage = req.files[0];
-
 
     if (!validators.isValidRequestBody(req.body))
       return res.status(400).send({
@@ -134,7 +133,9 @@ const createUser = async (req, res) => {
           const passAddress = JSON.parse(data.address);
           address = passAddress;
           data.address = address;
-        } catch (e) { res.status(400).send({ status: false, message: "Address is invalid." }) }
+        } catch (e) {
+          return res.status(400).send({ status: false, message: "Address is invalid." })
+        }
       }
       let { shipping, billing } = address;
 
@@ -476,11 +477,13 @@ const updateUser = async (req, res) => {
       try {
         const passAddress = JSON.parse(data.address);
         address = passAddress;
-      } catch (e) { res.status(400).send({ status: false, message: 'Address format is invalid.' }) }
+      } catch (e) {
+        return res.status(400).send({ status: false, message: 'Address format is invalid.' })
+      }
 
       let { shipping, billing } = address;
 
-      //Shipping
+      //----Shipping
       if ("shipping" in address) {
         let { street, city, pincode } = shipping;
         if (street) {
@@ -498,7 +501,7 @@ const updateUser = async (req, res) => {
           updateObject.address.shipping.pincode = pincode;
         }
       }
-      //Billing
+      //----Billing
       if ("billing" in address) {
         let { street, city, pincode } = billing;
         if (street) {
