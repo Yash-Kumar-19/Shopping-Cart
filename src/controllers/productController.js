@@ -242,13 +242,13 @@ let getProduct = async (req, res) => {
             return res.status(200).send(
                 {
                     status: true,
-                    message: 'Product list',
+                    message: 'Success',
                     data: newData
                 })
         }
 
         //---------[Response Send]
-        res.status(200).send({ status: true, message: 'Success'})
+        res.status(200).send({ status: true, message: 'Success', data: data})
     }
     catch (err) {
         return res.status(500).send({ status: false, message: err.message })
