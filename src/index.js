@@ -12,7 +12,7 @@ app.use(multer().any())
 // =============================[ Connect DataBase ]=========================
 mongoose
   .connect(
-    "mongodb+srv://sarhank44:sarhank8299@sarhancluster.fxjt3wn.mongodb.net/gorup6Database",
+    "mongodb+srv://Yash1999:3Bw0gG3jLVVmLcCb@cluster0.0pxxn.mongodb.net/shoppingCart",
     {
       useNewUrlParser: true,
     }

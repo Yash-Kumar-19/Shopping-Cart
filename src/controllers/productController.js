@@ -9,18 +9,24 @@ const createProduct = async (req, res) => {
     try {
         let data = req.body;
         let productImage = req.files[0];
+         //------(Body)
+        if (!validators.isValidRequestBody(data))
+            return res.status(400).send({
+            status: false,
+            message:"Invalid request parameter. Please provide user details in request body.",
+           });
+        
+        //------(productImage)
+        if (!productImage)
+            return res
+                .status(400)
+                .send({ status: false, message: "product image is required." });
 
+                
         //------(Destructure)
         let { title, description, price, currencyId, style, availableSizes, installments } = data
 
-        //<--------------------------------[ Validations ]-------------------------------->
-        //------(Body)
-        if (!validators.isValidRequestBody(req.body))
-            return res.status(400).send({
-                status: false,
-                message:
-                    "Invalid request parameter. Please provide user details in request body.",
-            });
+        //<--------------------------------[ Validations ]------------------------------->
 
         //------(title)
         if (!validators.isValidField(title))
@@ -104,11 +110,6 @@ const createProduct = async (req, res) => {
                 });
             }
         }
-        //------(productImage)
-        if (!productImage)
-            return res
-                .status(400)
-                .send({ status: false, message: "product image is required." });
 
         if (!validators.isvalidImage(productImage))
             return res.status(400).send({

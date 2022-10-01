@@ -10,7 +10,6 @@ const createUser = async (req, res) => {
   try {
     let data = req.body;
     let profileImage = req.files[0];
-
     if (!validators.isValidRequestBody(req.body))
       return res.status(400).send({
         status: false,
@@ -68,7 +67,6 @@ const createUser = async (req, res) => {
         status: false,
         message: "Phone number has already been used.",
       });
-
     //<-------(Email)--------->
     if (!validators.isValidField(email))
       return res
@@ -86,7 +84,7 @@ const createUser = async (req, res) => {
       return res
         .status(400)
         .send({ status: false, message: "Email has already been registered." });
-
+       
     //<-------(Password)--------->
     if (!validators.isValidField(password))
       return res
@@ -105,7 +103,7 @@ const createUser = async (req, res) => {
         return res.status(500).send({ status: false, message: err.message });
       data.password = hash;
     });
-
+  
     //<-------(Image)--------->
 
     if (!profileImage)
@@ -126,6 +124,7 @@ const createUser = async (req, res) => {
         .status(400)
         .send({ status: false, message: "Address is required." });
     }
+    
     //<--------------(Address)--------------->
     if (address) {
       if (address) {
@@ -217,11 +216,12 @@ const createUser = async (req, res) => {
     }
 
     //<--------(response)---------->
-
+    console.log(data)
     let create = await userModel.create(data);
     res.status(201).send({ status: true, message: 'Success', data: create });
 
   } catch (err) {
+    console.log(err)
     return res.status(500).send({ status: false, message: err.message });
   }
 };
